@@ -1,0 +1,186 @@
+/* ============================================
+   Ocean View Resort - Custom Styles
+   ============================================ */
+
+/* ---- Global ---- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* ---- Login Page ---- */
+.login-page {
+    background: linear-gradient(135deg, #0d6efd 0%, #0099cc 50%, #00bcd4 100%);
+    min-height: 100vh;
+}
+
+.login-page .card {
+    border: none;
+    border-radius: 15px;
+}
+
+/* ---- Navbar ---- */
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.3rem;
+}
+
+.navbar .nav-link {
+    padding: 0.5rem 1rem;
+    transition: background-color 0.2s;
+    border-radius: 5px;
+    margin: 0 2px;
+}
+
+.navbar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.navbar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+}
+
+/* ---- Stat Cards ---- */
+.stat-card {
+    border-left-width: 4px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+/* ---- Room Cards ---- */
+.room-card {
+    border-top-width: 3px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.room-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ---- Tables ---- */
+.table th {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* ---- Cards ---- */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+}
+
+/* ---- Badges ---- */
+.badge {
+    font-weight: 500;
+    padding: 0.4em 0.8em;
+}
+
+/* ---- Buttons ---- */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.btn-group-sm .btn {
+    border-radius: 5px;
+}
+
+/* ---- Footer ---- */
+.footer {
+    border-top: 1px solid #dee2e6;
+}
+
+/* ---- Alerts ---- */
+.alert {
+    border-radius: 10px;
+}
+
+/* ---- Forms ---- */
+.form-control:focus,
+.form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* ---- Print Styles ---- */
+@media print {
+    .navbar, .footer, .no-print, .btn, .alert {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+    }
+
+    .card {
+        border: 1px solid #ddd;
+        box-shadow: none;
+    }
+
+    main {
+        padding: 0 !important;
+    }
+}
+
+/* ---- Progress Bar ---- */
+.progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ---- Accordion ---- */
+.accordion-button:not(.collapsed) {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+}
