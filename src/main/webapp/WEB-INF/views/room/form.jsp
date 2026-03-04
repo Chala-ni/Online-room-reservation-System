@@ -6,14 +6,13 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-${empty room ? 'plus-circle' : 'pencil'}"></i>
-                        ${empty room ? 'Add New Room' : 'Edit Room'}
-                    </h4>
+            <div class="dark-card">
+                <div class="dark-card-header">
+                    <div class="card-subtitle">${empty room ? 'Create' : 'Edit'}</div>
+                    <div class="card-title"><i class="bi bi-${empty room ? 'plus-circle' : 'pencil'} me-2"></i>${empty room ? 'Add New Room' : 'Edit Room'}</div>
                 </div>
-                <div class="card-body">
+                <div class="dark-card-body">
+                    <div class="info-section">
                     <form method="post" 
                           action="${pageContext.request.contextPath}/rooms/${empty room ? 'new' : 'edit'}">
                         
@@ -36,7 +35,7 @@
                                 <option value="">-- Select Type --</option>
                                 <c:forEach var="type" items="${roomTypes}">
                                     <option value="${type}" ${room.roomType == type ? 'selected' : ''}>
-                                        ${type} ($${type.defaultRate}/night, max ${type.defaultMaxOccupancy} guests)
+                                        ${type} (LKR ${type.defaultRate}/night, max ${type.defaultMaxOccupancy} guests)
                                     </option>
                                 </c:forEach>
                             </select>
@@ -44,7 +43,7 @@
 
                         <!-- Rate Per Night -->
                         <div class="mb-3">
-                            <label for="ratePerNight" class="form-label">Rate Per Night ($)</label>
+                            <label for="ratePerNight" class="form-label">Rate Per Night (LKR)</label>
                             <input type="number" class="form-control" id="ratePerNight" name="ratePerNight" 
                                    value="${room.ratePerNight}" step="0.01" min="0"
                                    placeholder="Leave empty to use default rate">
@@ -89,6 +88,7 @@
                             </a>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,71 +4,76 @@
 
 <t:layout title="Reservation Report" active="reports">
 
-    <h2 class="mb-4"><i class="bi bi-calendar-check"></i> Reservation Report</h2>
-
     <!-- Date Filter -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <form method="get" action="${pageContext.request.contextPath}/reports/reservations" class="row g-3 align-items-end">
-                <div class="col-md-4">
-                    <label for="startDate" class="form-label">Start Date</label>
-                    <input type="date" class="form-control" id="startDate" name="startDate" 
-                           value="${startDate}" required>
-                </div>
-                <div class="col-md-4">
-                    <label for="endDate" class="form-label">End Date</label>
-                    <input type="date" class="form-control" id="endDate" name="endDate" 
-                           value="${endDate}" required>
-                </div>
-                <div class="col-md-4">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-search"></i> Generate Report
-                    </button>
-                </div>
-            </form>
+    <div class="dark-card mb-4">
+        <div class="dark-card-header">
+            <div class="card-subtitle">Report</div>
+            <div class="card-title"><i class="bi bi-calendar-check me-2"></i>Reservation Report</div>
+        </div>
+        <div class="dark-card-body">
+            <div class="filter-section">
+                <form method="get" action="${pageContext.request.contextPath}/reports/reservations" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate" name="startDate" 
+                               value="${startDate}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate" name="endDate" 
+                               value="${endDate}" required>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Generate Report
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <!-- Results -->
     <c:if test="${not empty reservations}">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Reservations from ${startDate} to ${endDate}
-                    <span class="badge bg-primary">${reservations.size()} records</span>
-                </h5>
+        <div class="dark-card">
+            <div class="dark-card-header d-flex justify-content-between align-items-center">
+                <div class="card-title" style="font-size: 1rem;">Reservations from ${startDate} to ${endDate}</div>
+                <span class="badge bg-primary">${reservations.size()} records</span>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Reservation #</th>
-                                <th>Guest</th>
-                                <th>Room</th>
-                                <th>Check-in</th>
-                                <th>Check-out</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="res" items="${reservations}">
+            <div class="dark-card-body">
+                <div class="table-section">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
                                 <tr>
-                                    <td>${res.reservationNumber}</td>
-                                    <td>${res.guestName}</td>
-                                    <td>${res.roomNumber}</td>
-                                    <td>${res.checkInDate}</td>
-                                    <td>${res.checkOutDate}</td>
-                                    <td>
-                                        <span class="badge bg-${res.status == 'CONFIRMED' ? 'primary' : 
-                                            res.status == 'CHECKED_IN' ? 'success' : 
-                                            res.status == 'CHECKED_OUT' ? 'info' : 'danger'}">
-                                            ${res.status}
-                                        </span>
-                                    </td>
+                                    <th>Reservation #</th>
+                                    <th>Guest</th>
+                                    <th>Room</th>
+                                    <th>Check-in</th>
+                                    <th>Check-out</th>
+                                    <th>Status</th>
                                 </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="res" items="${reservations}">
+                                    <tr>
+                                        <td>${res.reservationNumber}</td>
+                                        <td>${res.guestName}</td>
+                                        <td>${res.roomNumber}</td>
+                                        <td>${res.checkInDate}</td>
+                                        <td>${res.checkOutDate}</td>
+                                        <td>
+                                            <span class="badge bg-${res.status.name() eq 'CONFIRMED' ? 'primary' : 
+                                                res.status.name() eq 'CHECKED_IN' ? 'success' : 
+                                                res.status.name() eq 'CHECKED_OUT' ? 'info' : 'danger'}">
+                                                ${res.status}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

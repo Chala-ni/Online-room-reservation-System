@@ -7,86 +7,105 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <a href="${pageContext.request.contextPath}/bills" class="btn btn-outline-secondary mb-3">
+            <a href="${pageContext.request.contextPath}/bills" class="btn btn-secondary mb-3">
                 <i class="bi bi-arrow-left"></i> Back to Bills
             </a>
 
-            <div class="card" id="billPrint">
-                <div class="card-header text-center bg-primary text-white">
-                    <h3 class="mb-0"><i class="bi bi-water"></i> Ocean View Resort</h3>
-                    <p class="mb-0">Room Reservation Invoice</p>
-                </div>
-                <div class="card-body">
-                    <!-- Bill Header -->
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5>Guest Details</h5>
-                            <p class="mb-1"><strong>${bill.guestName}</strong></p>
-                            <p class="mb-1">Room: ${bill.roomNumber}</p>
-                            <p class="mb-0">Reservation: ${bill.reservationNumber}</p>
+            <div class="dark-card" id="billPrint">
+                <div class="dark-card-header">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                        <div>
+                            <div class="card-subtitle">Invoice</div>
+                            <div class="card-title"><i class="bi bi-water me-2"></i>Ocean View Resort</div>
+                            <div class="header-badge bg-${bill.paymentStatus.name() eq 'PAID' ? 'success' : 
+                                bill.paymentStatus.name() eq 'PENDING' ? 'warning' : 'danger'}">
+                                <i class="bi bi-${bill.paymentStatus.name() eq 'PAID' ? 'check-circle' : 'clock'}"></i>
+                                ${bill.paymentStatus}
+                            </div>
                         </div>
-                        <div class="col-md-6 text-md-end">
-                            <h5>Bill #${bill.id}</h5>
-                            <p class="mb-1">Date: ${bill.createdAt}</p>
-                            <p class="mb-0">
-                                Status: 
-                                <span class="badge bg-${bill.paymentStatus == 'PAID' ? 'success' : 
-                                    bill.paymentStatus == 'PENDING' ? 'warning' : 'danger'} fs-6">
-                                    ${bill.paymentStatus}
-                                </span>
-                            </p>
+                        <div class="text-end">
+                            <div style="font-size: 2rem; font-weight: 700; color: #60a5fa;">LKR <fmt:formatNumber value="${bill.totalAmount}" maxFractionDigits="2"/></div>
+                            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">TOTAL AMOUNT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dark-card-body">
+                    <div class="info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                        <!-- Guest Info -->
+                        <div class="info-section">
+                            <div class="section-title"><i class="bi bi-person"></i> Guest Details</div>
+                            <div class="info-row">
+                                <span class="info-label">Name</span>
+                                <span class="info-value">${bill.guestName}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Room</span>
+                                <span class="info-value highlight">${bill.roomNumber}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Reservation</span>
+                                <span class="info-value">${bill.reservationNumber}</span>
+                            </div>
+                        </div>
+
+                        <!-- Bill Info -->
+                        <div class="info-section">
+                            <div class="section-title"><i class="bi bi-receipt"></i> Bill Info</div>
+                            <div class="info-row">
+                                <span class="info-label">Bill #</span>
+                                <span class="info-value">${bill.id}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Generated</span>
+                                <span class="info-value">${bill.generatedAt}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Nights</span>
+                                <span class="info-value">${bill.numNights}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <hr>
-
-                    <!-- Bill Breakdown -->
-                    <table class="table">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Description</th>
-                                <th class="text-end">Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Room Charge (${bill.numNights} night(s) × $<fmt:formatNumber value="${bill.ratePerNight}" maxFractionDigits="2"/>)</td>
-                                <td class="text-end">$<fmt:formatNumber value="${bill.subtotal}" maxFractionDigits="2"/></td>
-                            </tr>
-                            <tr>
-                                <td>Service Charge (10%)</td>
-                                <td class="text-end">$<fmt:formatNumber value="${bill.serviceCharge}" maxFractionDigits="2"/></td>
-                            </tr>
-                            <tr>
-                                <td>Tourism Levy (2%)</td>
-                                <td class="text-end">$<fmt:formatNumber value="${bill.tourismLevy}" maxFractionDigits="2"/></td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <tr class="table-primary">
-                                <th class="fs-5">Total Amount</th>
-                                <th class="text-end fs-5">$<fmt:formatNumber value="${bill.totalAmount}" maxFractionDigits="2"/></th>
-                            </tr>
-                        </tfoot>
-                    </table>
-
-                    <!-- Actions -->
-                    <div class="d-flex gap-2 mt-4 no-print">
-                        <c:if test="${bill.paymentStatus == 'PENDING'}">
-                            <a href="${pageContext.request.contextPath}/bills/pay?id=${bill.id}" 
-                               class="btn btn-success"
-                               onclick="return confirm('Mark this bill as paid?')">
-                                <i class="bi bi-check-circle"></i> Mark as Paid
-                            </a>
-                        </c:if>
-                        <button onclick="window.print()" class="btn btn-outline-primary">
-                            <i class="bi bi-printer"></i> Print Invoice
-                        </button>
+                    <!-- Cost Breakdown -->
+                    <div class="info-section">
+                        <div class="section-title"><i class="bi bi-calculator"></i> Cost Breakdown</div>
+                        <div class="info-row">
+                            <span class="info-label">Room Charge (${bill.numNights} night(s) × LKR <fmt:formatNumber value="${bill.ratePerNight}" maxFractionDigits="2"/>)</span>
+                            <span class="info-value">LKR <fmt:formatNumber value="${bill.subtotal}" maxFractionDigits="2"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Service Charge (10%)</span>
+                            <span class="info-value">LKR <fmt:formatNumber value="${bill.serviceCharge}" maxFractionDigits="2"/></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Tourism Levy (2%)</span>
+                            <span class="info-value">LKR <fmt:formatNumber value="${bill.tourismLevy}" maxFractionDigits="2"/></span>
+                        </div>
+                        <div class="info-row" style="padding: 14px 0; margin-top: 8px; border-top: 2px solid #e2e8f0;">
+                            <span class="info-label" style="font-weight: 700; color: #0f172a; font-size: 1rem;">Total Amount</span>
+                            <span class="info-value" style="font-size: 1.2rem; color: #3b82f6;">LKR <fmt:formatNumber value="${bill.totalAmount}" maxFractionDigits="2"/></span>
+                        </div>
                     </div>
                 </div>
-                <div class="card-footer text-center text-muted">
-                    <small>Thank you for choosing Ocean View Resort!</small>
+
+                <!-- Actions -->
+                <div class="dark-card-footer no-print">
+                    <c:if test="${bill.paymentStatus.name() eq 'PENDING'}">
+                        <a href="${pageContext.request.contextPath}/bills/pay?id=${bill.id}" 
+                           class="btn btn-success"
+                           onclick="return confirm('Mark this bill as paid?')">
+                            <i class="bi bi-check-circle"></i> Mark as Paid
+                        </a>
+                    </c:if>
+                    <button onclick="window.print()" class="btn btn-outline-primary">
+                        <i class="bi bi-printer"></i> Print Invoice
+                    </button>
                 </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">Thank you for choosing Ocean View Resort!</small>
             </div>
         </div>
     </div>

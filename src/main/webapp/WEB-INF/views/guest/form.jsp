@@ -6,14 +6,13 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-${empty guest.id || guest.id == 0 ? 'person-plus' : 'pencil'}"></i>
-                        ${empty guest.id || guest.id == 0 ? 'Add New Guest' : 'Edit Guest'}
-                    </h4>
+            <div class="dark-card">
+                <div class="dark-card-header">
+                    <div class="card-subtitle">${empty guest.id || guest.id == 0 ? 'Create' : 'Edit'}</div>
+                    <div class="card-title"><i class="bi bi-${empty guest.id || guest.id == 0 ? 'person-plus' : 'pencil'} me-2"></i>${empty guest.id || guest.id == 0 ? 'Add New Guest' : 'Edit Guest'}</div>
                 </div>
-                <div class="card-body">
+                <div class="dark-card-body">
+                    <div class="info-section">
                     <form method="post" id="guestForm"
                           action="${pageContext.request.contextPath}/guests/${empty guest.id || guest.id == 0 ? 'new' : 'edit'}">
                         
@@ -51,7 +50,7 @@
                                 <label for="contactNumber" class="form-label">Contact Number <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control" id="contactNumber" name="contactNumber" 
                                        value="${guest.contactNumber}" required
-                                       placeholder="+44 1234 567890">
+                                       placeholder="e.g., 0771234567">
                             </div>
 
                             <!-- Email -->
@@ -67,7 +66,7 @@
                             <label for="nicPassport" class="form-label">NIC / Passport Number <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="nicPassport" name="nicPassport" 
                                    value="${guest.nicPassport}" required maxlength="20"
-                                   placeholder="e.g., AB1234567">
+                                   placeholder="e.g., 200012345678 or 901234567V or N1234567">
                         </div>
 
                         <!-- Buttons -->
@@ -81,6 +80,7 @@
                             </a>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </div>

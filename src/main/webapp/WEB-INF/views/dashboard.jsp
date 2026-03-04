@@ -94,11 +94,11 @@
                         <div>
                             <h6 class="text-muted">Monthly Revenue</h6>
                             <h3 class="mb-0 text-success">
-                                $<fmt:formatNumber value="${stats.monthlyRevenue}" maxFractionDigits="2"/>
+                                LKR <fmt:formatNumber value="${stats.monthlyRevenue}" maxFractionDigits="2"/>
                             </h3>
                         </div>
                         <div class="stat-icon bg-success">
-                            <i class="bi bi-currency-dollar"></i>
+                            <i class="bi bi-cash-stack"></i>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                         <div>
                             <h6 class="text-muted">Total Revenue</h6>
                             <h3 class="mb-0">
-                                $<fmt:formatNumber value="${stats.totalRevenue}" maxFractionDigits="2"/>
+                                LKR <fmt:formatNumber value="${stats.totalRevenue}" maxFractionDigits="2"/>
                             </h3>
                         </div>
                         <div class="stat-icon bg-primary">
@@ -146,50 +146,53 @@
     <div class="row g-4">
         <!-- Today's Check-ins -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Today's Check-ins 
-                        <span class="badge bg-light text-success">${stats.todayCheckIns}</span>
-                    </h5>
+            <div class="dark-card">
+                <div class="dark-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-title" style="font-size: 1rem;"><i class="bi bi-box-arrow-in-right me-2"></i>Today's Check-ins</div>
+                    <span class="badge bg-success">${stats.todayCheckIns}</span>
                 </div>
-                <div class="card-body">
+                <div class="dark-card-body">
                     <c:choose>
                         <c:when test="${not empty todayCheckIns}">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Reservation #</th>
-                                            <th>Guest</th>
-                                            <th>Room</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="res" items="${todayCheckIns}">
+                            <div class="table-section">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead>
                                             <tr>
-                                                <td>${res.reservationNumber}</td>
-                                                <td>${res.guestName}</td>
-                                                <td>${res.roomNumber}</td>
-                                                <td>
-                                                    <span class="badge bg-${res.status == 'CONFIRMED' ? 'primary' : 
-                                                        res.status == 'CHECKED_IN' ? 'success' : 'secondary'}">
-                                                        ${res.status}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="${pageContext.request.contextPath}/reservations/view?id=${res.id}" 
-                                                       class="btn btn-sm btn-outline-primary">View</a>
-                                                </td>
+                                                <th>Reservation #</th>
+                                                <th>Guest</th>
+                                                <th>Room</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
                                             </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="res" items="${todayCheckIns}">
+                                                <tr>
+                                                    <td>${res.reservationNumber}</td>
+                                                    <td>${res.guestName}</td>
+                                                    <td>${res.roomNumber}</td>
+                                                    <td>
+                                                        <span class="badge bg-${res.status.name() eq 'CONFIRMED' ? 'primary' : 
+                                                            res.status.name() eq 'CHECKED_IN' ? 'success' : 'secondary'}">
+                                                            ${res.status}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="${pageContext.request.contextPath}/reservations/view?id=${res.id}" 
+                                                           class="btn btn-sm btn-outline-primary">View</a>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <p class="text-muted text-center mb-0">No check-ins scheduled for today.</p>
+                            <div class="empty-state" style="padding: 32px 20px;">
+                                <p>No check-ins scheduled for today.</p>
+                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -198,50 +201,53 @@
 
         <!-- Today's Check-outs -->
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0"><i class="bi bi-box-arrow-right"></i> Today's Check-outs
-                        <span class="badge bg-light text-warning">${stats.todayCheckOuts}</span>
-                    </h5>
+            <div class="dark-card">
+                <div class="dark-card-header d-flex justify-content-between align-items-center">
+                    <div class="card-title" style="font-size: 1rem;"><i class="bi bi-box-arrow-right me-2"></i>Today's Check-outs</div>
+                    <span class="badge bg-warning">${stats.todayCheckOuts}</span>
                 </div>
-                <div class="card-body">
+                <div class="dark-card-body">
                     <c:choose>
                         <c:when test="${not empty todayCheckOuts}">
-                            <div class="table-responsive">
-                                <table class="table table-sm table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Reservation #</th>
-                                            <th>Guest</th>
-                                            <th>Room</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach var="res" items="${todayCheckOuts}">
+                            <div class="table-section">
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-hover mb-0">
+                                        <thead>
                                             <tr>
-                                                <td>${res.reservationNumber}</td>
-                                                <td>${res.guestName}</td>
-                                                <td>${res.roomNumber}</td>
-                                                <td>
-                                                    <span class="badge bg-${res.status == 'CHECKED_IN' ? 'success' : 
-                                                        res.status == 'CHECKED_OUT' ? 'info' : 'secondary'}">
-                                                        ${res.status}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a href="${pageContext.request.contextPath}/reservations/view?id=${res.id}" 
-                                                       class="btn btn-sm btn-outline-primary">View</a>
-                                                </td>
+                                                <th>Reservation #</th>
+                                                <th>Guest</th>
+                                                <th>Room</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
                                             </tr>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            <c:forEach var="res" items="${todayCheckOuts}">
+                                                <tr>
+                                                    <td>${res.reservationNumber}</td>
+                                                    <td>${res.guestName}</td>
+                                                    <td>${res.roomNumber}</td>
+                                                    <td>
+                                                        <span class="badge bg-${res.status.name() eq 'CHECKED_IN' ? 'success' : 
+                                                            res.status.name() eq 'CHECKED_OUT' ? 'info' : 'secondary'}">
+                                                            ${res.status}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="${pageContext.request.contextPath}/reservations/view?id=${res.id}" 
+                                                           class="btn btn-sm btn-outline-primary">View</a>
+                                                    </td>
+                                                </tr>
+                                            </c:forEach>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <p class="text-muted text-center mb-0">No check-outs scheduled for today.</p>
+                            <div class="empty-state" style="padding: 32px 20px;">
+                                <p>No check-outs scheduled for today.</p>
+                            </div>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -252,24 +258,26 @@
     <!-- Quick Actions -->
     <div class="row mt-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            <div class="dark-card">
+                <div class="dark-card-header">
+                    <div class="card-title" style="font-size: 1rem;"><i class="bi bi-lightning me-2"></i>Quick Actions</div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex gap-2 flex-wrap">
-                        <a href="${pageContext.request.contextPath}/reservations/new" class="btn btn-primary">
-                            <i class="bi bi-plus-circle"></i> New Reservation
-                        </a>
-                        <a href="${pageContext.request.contextPath}/guests/new" class="btn btn-success">
-                            <i class="bi bi-person-plus"></i> Add Guest
-                        </a>
-                        <a href="${pageContext.request.contextPath}/reservations" class="btn btn-info">
-                            <i class="bi bi-search"></i> Search Reservations
-                        </a>
-                        <a href="${pageContext.request.contextPath}/rooms" class="btn btn-secondary">
-                            <i class="bi bi-door-open"></i> View Rooms
-                        </a>
+                <div class="dark-card-body">
+                    <div class="info-section">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="${pageContext.request.contextPath}/reservations/new" class="btn btn-primary">
+                                <i class="bi bi-plus-circle"></i> New Reservation
+                            </a>
+                            <a href="${pageContext.request.contextPath}/guests/new" class="btn btn-success">
+                                <i class="bi bi-person-plus"></i> Add Guest
+                            </a>
+                            <a href="${pageContext.request.contextPath}/reservations" class="btn btn-info">
+                                <i class="bi bi-search"></i> Search Reservations
+                            </a>
+                            <a href="${pageContext.request.contextPath}/rooms" class="btn btn-secondary">
+                                <i class="bi bi-door-open"></i> View Rooms
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
