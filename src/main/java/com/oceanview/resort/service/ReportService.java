@@ -34,11 +34,9 @@ public class ReportService {
         dto.setOccupiedRooms(roomDAO.getCountByStatus(RoomStatus.OCCUPIED));
         dto.setMaintenanceRooms(roomDAO.getCountByStatus(RoomStatus.MAINTENANCE));
 
-        // Calculate occupancy rate
-        int totalUsable = dto.getTotalRooms() - dto.getMaintenanceRooms();
-        if (totalUsable > 0) {
-            dto.setOccupancyRate(Math.round((dto.getOccupiedRooms() * 100.0 / totalUsable) * 100.0) / 100.0);
-        }
+        // Calculate occupancy rate using database function fn_get_occupancy_rate
+        java.sql.Date today = new java.sql.Date(System.currentTimeMillis());
+        dto.setOccupancyRate(roomDAO.getOccupancyRateForDate(today));
 
         // Reservation stats
         dto.setTodayCheckIns(reservationDAO.getTodayCheckInsCount());

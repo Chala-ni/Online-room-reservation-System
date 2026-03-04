@@ -82,30 +82,6 @@ public class RoomDAO {
         return rooms;
     }
 
-    /**
-     * Find available rooms for a given date range (not booked and not under maintenance).
-     */
-    public List<Room> findAvailableRooms(Date checkIn, Date checkOut) throws SQLException {
-        List<Room> rooms = new ArrayList<>();
-        String sql = "SELECT rm.* FROM rooms rm " +
-                     "WHERE rm.status != 'MAINTENANCE' " +
-                     "AND rm.id NOT IN (" +
-                     "  SELECT r.room_id FROM reservations r " +
-                     "  WHERE r.status IN ('CONFIRMED', 'CHECKED_IN') " +
-                     "  AND r.check_in_date < ? AND r.check_out_date > ?" +
-                     ") ORDER BY rm.room_type, rm.room_number";
-        try (Connection conn = DBConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, checkOut);
-            stmt.setDate(2, checkIn);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                rooms.add(mapResultSetToRoom(rs));
-            }
-        }
-        return rooms;
-    }
-
     public int create(Room room) throws SQLException {
         String sql = "INSERT INTO rooms (room_number, room_type, rate_per_night, max_occupancy, description, status) " +
                      "VALUES (?, ?, ?, ?, ?, ?)";
@@ -202,5 +178,46 @@ public class RoomDAO {
         room.setCreatedAt(rs.getTimestamp("created_at"));
         room.setUpdatedAt(rs.getTimestamp("updated_at"));
         return room;
+    }
+
+    /**
+     * Get occupancy rate for a specific date using database function.
+     * Calls fn_get_occupancy_rate stored function.
+     * @param date The date to check occupancy for
+     * @return Occupancy rate as percentage (0-100)
+     */
+    public double getOccupancyRateForDate(java.sql.Date date) throws SQLException {
+        String sql = "SELECT fn_get_occupancy_rate(?) AS occupancy_rate";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, date);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getDouble("occupancy_rate");
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * Find available rooms using stored procedure.
+     * Calls sp_check_room_availability stored procedure for enhanced DB feature demonstration.
+     * @param checkIn Check-in date
+     * @param checkOut Check-out date
+     * @return List of available rooms for the date range
+     */
+    public List<Room> findAvailableRoomsUsingSP(java.sql.Date checkIn, java.sql.Date checkOut) throws SQLException {
+        List<Room> rooms = new ArrayList<>();
+        String sql = "{CALL sp_check_room_availability(?, ?)}";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             java.sql.CallableStatement stmt = conn.prepareCall(sql)) {
+            stmt.setDate(1, checkIn);
+            stmt.setDate(2, checkOut);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                rooms.add(mapResultSetToRoom(rs));
+            }
+        }
+        return rooms;
     }
 }
