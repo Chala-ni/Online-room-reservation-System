@@ -87,6 +87,41 @@ public class ValidationUtil {
     }
 
     /**
+     * Get specific password validation error message.
+     * Returns null if password is valid.
+     */
+    public static String getPasswordValidationError(String password) {
+        if (password == null || password.isEmpty()) {
+            return "Password is required.";
+        }
+        
+        StringBuilder errors = new StringBuilder();
+        
+        if (password.length() < 8) {
+            errors.append("Password must be at least 8 characters long. ");
+        }
+        
+        boolean hasUpper = false, hasLower = false, hasDigit = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpper = true;
+            if (Character.isLowerCase(c)) hasLower = true;
+            if (Character.isDigit(c)) hasDigit = true;
+        }
+        
+        if (!hasUpper) {
+            errors.append("Password must contain at least one uppercase letter. ");
+        }
+        if (!hasLower) {
+            errors.append("Password must contain at least one lowercase letter. ");
+        }
+        if (!hasDigit) {
+            errors.append("Password must contain at least one digit. ");
+        }
+        
+        return errors.length() > 0 ? errors.toString().trim() : null;
+    }
+
+    /**
      * Validate room number: 1-10 alphanumeric chars.
      */
     public static boolean isValidRoomNumber(String roomNumber) {
@@ -139,5 +174,40 @@ public class ValidationUtil {
      */
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * Validate a date string in yyyy-MM-dd format.
+     */
+    public static boolean isValidDate(String dateStr) {
+        if (dateStr == null || dateStr.trim().isEmpty()) return false;
+        try {
+            Date.valueOf(dateStr.trim());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Validate that check-out is after check-in.
+     */
+    public static boolean isValidDateRange(Date checkIn, Date checkOut) {
+        if (checkIn == null || checkOut == null) return false;
+        return checkOut.after(checkIn);
+    }
+
+    /**
+     * Validate contact/phone number (alias for isValidPhone).
+     */
+    public static boolean isValidContactNumber(String contact) {
+        return isValidPhone(contact);
+    }
+
+    /**
+     * Validate NIC or Passport (alias for isValidNicPassport).
+     */
+    public static boolean isValidNicOrPassport(String value) {
+        return isValidNicPassport(value);
     }
 }
