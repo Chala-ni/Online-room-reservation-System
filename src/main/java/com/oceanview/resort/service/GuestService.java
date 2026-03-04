@@ -44,4 +44,18 @@ public class GuestService {
     public int getTotalCount() throws SQLException {
         return guestDAO.getTotalCount();
     }
+
+    /**
+     * Create a guest (alias for createGuest).
+     */
+    public int create(Guest guest) throws SQLException {
+        return createGuest(guest);
+    }
+
+    /**
+     * Update a guest (alias for updateGuest).
+     */
+    public boolean update(Guest guest) throws SQLException {
+        return updateGuest(guest);
+    }
 }

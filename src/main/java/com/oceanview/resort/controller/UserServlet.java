@@ -3,6 +3,7 @@ package com.oceanview.resort.controller;
 import com.oceanview.resort.model.User;
 import com.oceanview.resort.model.enums.UserRole;
 import com.oceanview.resort.service.AuthService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import com.oceanview.resort.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -41,13 +42,15 @@ public class UserServlet extends HttpServlet {
                 showCreateForm(request, response);
             } else if (pathInfo.equals("/deactivate")) {
                 deactivateUser(request, response);
+            } else if (pathInfo.equals("/activate")) {
+                activateUser(request, response);
             } else if (pathInfo.equals("/password")) {
                 showPasswordForm(request, response);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -72,7 +75,7 @@ public class UserServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -104,8 +107,11 @@ public class UserServlet extends HttpServlet {
         // Validate
         StringBuilder errors = new StringBuilder();
         if (!ValidationUtil.isValidUsername(username)) errors.append("Username must be 3-50 alphanumeric characters. ");
-        if (!ValidationUtil.isValidPassword(password)) errors.append("Password must be at least 6 characters. ");
-        if (!ValidationUtil.isValidName(fullName)) errors.append("Full name is required. ");
+        
+        String passwordError = ValidationUtil.getPasswordValidationError(password);
+        if (passwordError != null) errors.append(passwordError).append(" ");
+        
+        if (!ValidationUtil.isValidName(fullName)) errors.append("Full name must be 2-100 characters, letters and spaces only (no digits or special characters). ");
         if (!ValidationUtil.isValidEmail(email)) errors.append("Valid email is required. ");
         if (roleStr == null) errors.append("Role is required. ");
 
@@ -116,6 +122,18 @@ public class UserServlet extends HttpServlet {
         }
 
         try {
+            // Pre-check for duplicate username
+            if (authService.findByUsername(username) != null) {
+                request.setAttribute("error", "A user with this username already exists.");
+                showCreateForm(request, response);
+                return;
+            }
+            // Pre-check for duplicate email
+            if (authService.findByEmail(email) != null) {
+                request.setAttribute("error", "A user with this email already exists.");
+                showCreateForm(request, response);
+                return;
+            }
             authService.createUser(username, password, UserRole.valueOf(roleStr), fullName, email);
             response.sendRedirect(request.getContextPath() + "/users?success=User+created+successfully");
         } catch (IllegalArgumentException e) {
@@ -139,6 +157,14 @@ public class UserServlet extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/users?success=User+deactivated+successfully");
     }
 
+    private void activateUser(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        authService.activateUser(id);
+        response.sendRedirect(request.getContextPath() + "/users?success=User+activated+successfully");
+    }
+
     private void showPasswordForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -151,8 +177,9 @@ public class UserServlet extends HttpServlet {
         int userId = Integer.parseInt(request.getParameter("userId"));
         String newPassword = request.getParameter("newPassword");
 
-        if (!ValidationUtil.isValidPassword(newPassword)) {
-            request.setAttribute("error", "Password must be at least 6 characters.");
+        String passwordError = ValidationUtil.getPasswordValidationError(newPassword);
+        if (passwordError != null) {
+            request.setAttribute("error", passwordError);
             request.setAttribute("userId", userId);
             showPasswordForm(request, response);
             return;

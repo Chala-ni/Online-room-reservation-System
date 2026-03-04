@@ -148,6 +148,34 @@ public class UserDAO {
     }
 
     /**
+     * Find a user by email.
+     */
+    public User findByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return mapResultSetToUser(rs);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Activate a previously deactivated user.
+     */
+    public boolean activate(int userId) throws SQLException {
+        String sql = "UPDATE users SET is_active = TRUE WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+    /**
      * Map a ResultSet row to a User object.
      */
     private User mapResultSetToUser(ResultSet rs) throws SQLException {

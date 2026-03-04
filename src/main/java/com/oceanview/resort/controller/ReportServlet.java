@@ -3,6 +3,7 @@ package com.oceanview.resort.controller;
 import com.oceanview.resort.model.Reservation;
 import com.oceanview.resort.service.ReportService;
 import com.oceanview.resort.service.BillingService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -50,7 +51,7 @@ public class ReportServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }

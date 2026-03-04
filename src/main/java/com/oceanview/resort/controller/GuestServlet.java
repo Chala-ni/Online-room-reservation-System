@@ -2,6 +2,7 @@ package com.oceanview.resort.controller;
 
 import com.oceanview.resort.model.Guest;
 import com.oceanview.resort.service.GuestService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import com.oceanview.resort.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -42,7 +43,7 @@ public class GuestServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -62,7 +63,7 @@ public class GuestServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -181,9 +182,9 @@ public class GuestServlet extends HttpServlet {
     private String validateGuest(Guest guest) {
         if (!ValidationUtil.isValidName(guest.getName())) return "Please enter a valid name (2-100 characters, letters and spaces only).";
         if (!ValidationUtil.isValidAddress(guest.getAddress())) return "Please enter a valid address (5-255 characters).";
-        if (!ValidationUtil.isValidContactNumber(guest.getContactNumber())) return "Please enter a valid phone number.";
+        if (!ValidationUtil.isValidContactNumber(guest.getContactNumber())) return "Please enter a valid Sri Lankan phone number (10 digits starting with 0, e.g., 0771234567).";
         if (!ValidationUtil.isValidEmail(guest.getEmail())) return "Please enter a valid email address.";
-        if (!ValidationUtil.isValidNicOrPassport(guest.getNicPassport())) return "Please enter a valid NIC or Passport number.";
+        if (!ValidationUtil.isValidNicOrPassport(guest.getNicPassport())) return "Please enter a valid NIC (12 digits or 9 digits followed by V/X, e.g., 200012345678 or 901234567V) or Passport number (letter followed by 7-8 digits, e.g., N1234567).";
         if (guest.getNationality() == null || guest.getNationality().trim().isEmpty()) return "Nationality is required.";
         return null;
     }

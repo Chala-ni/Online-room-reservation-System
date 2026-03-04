@@ -4,6 +4,7 @@ import com.oceanview.resort.model.Room;
 import com.oceanview.resort.model.enums.RoomStatus;
 import com.oceanview.resort.model.enums.RoomType;
 import com.oceanview.resort.service.RoomService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 /**
@@ -44,7 +46,7 @@ public class RoomServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -64,7 +66,7 @@ public class RoomServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -145,21 +147,32 @@ public class RoomServlet extends HttpServlet {
             return;
         }
 
+        // Check if room number already exists
+        Room existingRoom = roomService.findByRoomNumber(roomNumber.trim());
+        if (existingRoom != null) {
+            request.setAttribute("error", "Room number '" + roomNumber.trim() + "' already exists. Please use a different room number.");
+            showCreateForm(request, response);
+            return;
+        }
+
         try {
-            Room room = roomService.createRoom(roomNumber.trim(), RoomType.valueOf(roomTypeStr));
-            
-            // Override rate and description if provided
             String rateStr = request.getParameter("ratePerNight");
-            if (rateStr != null && !rateStr.isEmpty()) {
-                room.setRatePerNight(Double.parseDouble(rateStr));
-            }
+            String maxOccStr = request.getParameter("maxOccupancy");
             String description = request.getParameter("description");
-            if (description != null && !description.isEmpty()) {
-                room.setDescription(description);
+
+            double rate = (rateStr != null && !rateStr.isEmpty()) ? Double.parseDouble(rateStr) : 0;
+            int maxOcc = (maxOccStr != null && !maxOccStr.isEmpty()) ? Integer.parseInt(maxOccStr) : 2;
+
+            if (rate > 0) {
+                roomService.createRoom(roomNumber.trim(), RoomType.valueOf(roomTypeStr), rate, maxOcc, description);
+            } else {
+                roomService.createRoom(roomNumber.trim(), RoomType.valueOf(roomTypeStr));
             }
 
-            roomService.update(room);
             response.sendRedirect(request.getContextPath() + "/rooms?success=Room+created+successfully");
+        } catch (SQLIntegrityConstraintViolationException e) {
+            request.setAttribute("error", "Room number '" + roomNumber.trim() + "' already exists. Please use a different room number.");
+            showCreateForm(request, response);
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
             showCreateForm(request, response);

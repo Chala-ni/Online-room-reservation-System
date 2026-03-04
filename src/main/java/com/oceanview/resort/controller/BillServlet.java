@@ -4,6 +4,7 @@ import com.oceanview.resort.model.Bill;
 import com.oceanview.resort.model.Reservation;
 import com.oceanview.resort.service.BillingService;
 import com.oceanview.resort.service.ReservationService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -42,7 +43,7 @@ public class BillServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -82,7 +83,7 @@ public class BillServlet extends HttpServlet {
                 return;
             }
 
-            Bill bill = billingService.generateBill(reservation);
+            Bill bill = billingService.generateBill(reservation.getId());
             response.sendRedirect(request.getContextPath() + "/bills/view?id=" + bill.getId()
                     + "&success=Bill+generated+successfully");
         } catch (IllegalStateException e) {

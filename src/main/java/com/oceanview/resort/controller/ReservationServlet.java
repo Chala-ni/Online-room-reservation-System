@@ -10,6 +10,7 @@ import com.oceanview.resort.service.GuestService;
 import com.oceanview.resort.service.ReservationService;
 import com.oceanview.resort.service.RoomService;
 import com.oceanview.resort.util.DateUtil;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import com.oceanview.resort.util.ValidationUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -57,7 +58,7 @@ public class ReservationServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
@@ -77,7 +78,7 @@ public class ReservationServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (SQLException e) {
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.setAttribute("error", ErrorMessageUtil.translateSQLException(e));
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
