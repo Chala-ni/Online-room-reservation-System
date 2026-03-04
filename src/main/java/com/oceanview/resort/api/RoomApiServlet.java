@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.oceanview.resort.model.Room;
 import com.oceanview.resort.model.enums.RoomStatus;
 import com.oceanview.resort.service.RoomService;
+import com.oceanview.resort.util.ErrorMessageUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -84,7 +85,7 @@ public class RoomApiServlet extends HttpServlet {
             }
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print(errorJson("Database error: " + e.getMessage()));
+            out.print(errorJson(ErrorMessageUtil.translateSQLException(e)));
         }
     }
 
