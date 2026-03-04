@@ -52,10 +52,6 @@ public class RoomService {
         return roomDAO.findAll();
     }
 
-    public List<Room> findAvailableRooms(Date checkIn, Date checkOut) throws SQLException {
-        return roomDAO.findAvailableRooms(checkIn, checkOut);
-    }
-
     public List<Room> findByStatus(RoomStatus status) throws SQLException {
         return roomDAO.findByStatus(status);
     }
@@ -82,5 +78,13 @@ public class RoomService {
 
     public int getCountByStatus(RoomStatus status) throws SQLException {
         return roomDAO.getCountByStatus(status);
+    }
+
+    /**
+     * Find rooms available for specific dates using stored procedure.
+     * Calls sp_check_room_availability for enhanced database feature demonstration.
+     */
+    public List<Room> findAvailableForDates(Date checkIn, Date checkOut) throws SQLException {
+        return roomDAO.findAvailableRoomsUsingSP(checkIn, checkOut);
     }
 }
