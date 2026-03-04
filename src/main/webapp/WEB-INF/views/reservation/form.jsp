@@ -6,14 +6,13 @@
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="bi bi-${empty reservation ? 'plus-circle' : 'pencil'}"></i>
-                        ${empty reservation ? 'New Reservation' : 'Edit Reservation'}
-                    </h4>
+            <div class="dark-card">
+                <div class="dark-card-header">
+                    <div class="card-subtitle">${empty reservation ? 'Create' : 'Edit'}</div>
+                    <div class="card-title"><i class="bi bi-${empty reservation ? 'plus-circle' : 'pencil'} me-2"></i>${empty reservation ? 'New Reservation' : 'Edit Reservation'}</div>
                 </div>
-                <div class="card-body">
+                <div class="dark-card-body">
+                    <div class="info-section">
                     <form method="post" id="reservationForm"
                           action="${pageContext.request.contextPath}/reservations/${empty reservation ? 'new' : 'edit'}">
                         
@@ -51,7 +50,7 @@
                                         data-max="${room.maxOccupancy}"
                                         ${reservation.roomId == room.id ? 'selected' : ''}>
                                         Room ${room.roomNumber} - ${room.roomType} 
-                                        ($${room.ratePerNight}/night, max ${room.maxOccupancy} guests)
+                                        (LKR ${room.ratePerNight}/night, max ${room.maxOccupancy} guests)
                                     </option>
                                 </c:forEach>
                             </select>
@@ -97,8 +96,8 @@
                             <div class="alert alert-info">
                                 <strong>Estimated Cost:</strong>
                                 <span id="numNights">0</span> night(s) × 
-                                $<span id="rateDisplay">0</span>/night = 
-                                <strong>$<span id="subtotalDisplay">0</span></strong>
+                                LKR <span id="rateDisplay">0</span>/night = 
+                                <strong>LKR <span id="subtotalDisplay">0</span></strong>
                                 <small class="text-muted">(+ taxes & charges)</small>
                             </div>
                         </div>
@@ -114,18 +113,20 @@
                             </a>
                         </div>
                     </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Cost preview calculation
+        // Cost preview and room availability filtering
         document.addEventListener('DOMContentLoaded', function() {
             const roomSelect = document.getElementById('roomId');
             const checkIn = document.getElementById('checkInDate');
             const checkOut = document.getElementById('checkOutDate');
             const costPreview = document.getElementById('costPreview');
+            const contextPath = '${pageContext.request.contextPath}';
 
             function updateCost() {
                 const selectedOption = roomSelect.options[roomSelect.selectedIndex];
@@ -144,9 +145,43 @@
                 }
             }
 
+            function loadAvailableRooms() {
+                if (!checkIn.value || !checkOut.value) return;
+                const start = new Date(checkIn.value);
+                const end = new Date(checkOut.value);
+                if (end <= start) return;
+
+                const selectedRoomId = roomSelect.value;
+                const url = contextPath + '/api/rooms/available?checkIn=' +
+                    encodeURIComponent(checkIn.value) + '&checkOut=' + encodeURIComponent(checkOut.value);
+
+                fetch(url)
+                    .then(function(response) { return response.json(); })
+                    .then(function(rooms) {
+                        roomSelect.innerHTML = '<option value="">-- Select Room --</option>';
+                        rooms.forEach(function(room) {
+                            const option = document.createElement('option');
+                            option.value = room.id;
+                            option.setAttribute('data-rate', room.ratePerNight);
+                            option.setAttribute('data-max', room.maxOccupancy);
+                            option.textContent = 'Room ' + room.roomNumber + ' - ' + room.roomType +
+                                ' (LKR ' + room.ratePerNight + '/night, max ' + room.maxOccupancy + ' guests)';
+                            if (String(room.id) === selectedRoomId) option.selected = true;
+                            roomSelect.appendChild(option);
+                        });
+                        updateCost();
+                    });
+            }
+
             roomSelect.addEventListener('change', updateCost);
-            checkIn.addEventListener('change', updateCost);
-            checkOut.addEventListener('change', updateCost);
+            checkIn.addEventListener('change', function() {
+                loadAvailableRooms();
+                updateCost();
+            });
+            checkOut.addEventListener('change', function() {
+                loadAvailableRooms();
+                updateCost();
+            });
             updateCost();
         });
     </script>

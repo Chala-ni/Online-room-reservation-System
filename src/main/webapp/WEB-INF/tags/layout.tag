@@ -8,124 +8,167 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title} - Ocean View Resort</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
 </head>
 <body>
     <c:if test="${not empty sessionScope.user}">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/dashboard">
-                <i class="bi bi-water"></i> Ocean View Resort
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <!-- Brand -->
+        <div class="sidebar-brand">
+            <a href="${pageContext.request.contextPath}/dashboard">
+                <i class="bi bi-water"></i>
+                <span class="brand-text">Ocean View</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="sidebar-nav">
+            <div class="nav-section-title">Main</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="${pageContext.request.contextPath}/dashboard" class="${active == 'dashboard' ? 'active' : ''}">
+                        <i class="bi bi-grid-1x2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/reservations" class="${active == 'reservations' ? 'active' : ''}">
+                        <i class="bi bi-calendar-check"></i>
+                        <span>Reservations</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/guests" class="${active == 'guests' ? 'active' : ''}">
+                        <i class="bi bi-people"></i>
+                        <span>Guests</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/rooms" class="${active == 'rooms' ? 'active' : ''}">
+                        <i class="bi bi-door-open"></i>
+                        <span>Rooms</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/bills" class="${active == 'bills' ? 'active' : ''}">
+                        <i class="bi bi-receipt"></i>
+                        <span>Bills</span>
+                    </a>
+                </li>
+            </ul>
+
+            <c:if test="${sessionScope.userRole == 'ADMIN'}">
+            <div class="nav-section-title">Administration</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="${pageContext.request.contextPath}/reports" class="${active == 'reports' ? 'active' : ''}">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/users" class="${active == 'users' ? 'active' : ''}">
+                        <i class="bi bi-person-gear"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+            </ul>
+            </c:if>
+
+            <div class="nav-section-title">Support</div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="${pageContext.request.contextPath}/help" class="${active == 'help' ? 'active' : ''}">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Help &amp; Docs</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <div class="user-mini">
+                <div class="user-avatar">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">${sessionScope.fullName}</span>
+                    <span class="user-role">${sessionScope.userRole}</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Top Header Bar -->
+    <header class="topbar" id="topbar">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle" title="Toggle Sidebar">
+                <i class="bi bi-list"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'dashboard' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/dashboard">
-                            <i class="bi bi-speedometer2"></i> Dashboard
+            <h1 class="page-title">${title}</h1>
+        </div>
+        <div class="topbar-right">
+            <div class="topbar-user dropdown">
+                <a class="dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div class="user-avatar-sm">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <span class="d-none d-md-inline">${sessionScope.fullName}</span>
+                    <span class="badge role-badge">${sessionScope.userRole}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li class="dropdown-header">Signed in as <strong>${sessionScope.user.username}</strong></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/logout">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sign Out
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'reservations' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/reservations">
-                            <i class="bi bi-calendar-check"></i> Reservations
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'guests' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/guests">
-                            <i class="bi bi-people"></i> Guests
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'rooms' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/rooms">
-                            <i class="bi bi-door-open"></i> Rooms
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'bills' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/bills">
-                            <i class="bi bi-receipt"></i> Bills
-                        </a>
-                    </li>
-                    <c:if test="${sessionScope.userRole == 'ADMIN'}">
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'reports' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/reports">
-                            <i class="bi bi-graph-up"></i> Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'users' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/users">
-                            <i class="bi bi-person-gear"></i> Users
-                        </a>
-                    </li>
-                    </c:if>
-                    <li class="nav-item">
-                        <a class="nav-link ${active == 'help' ? 'active' : ''}" 
-                           href="${pageContext.request.contextPath}/help">
-                            <i class="bi bi-question-circle"></i> Help
-                        </a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" 
-                           data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> ${sessionScope.fullName}
-                            <span class="badge bg-light text-primary">${sessionScope.userRole}</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a></li>
-                        </ul>
                     </li>
                 </ul>
             </div>
         </div>
-    </nav>
+    </header>
     </c:if>
 
-    <!-- Main Content -->
-    <main class="container-fluid py-4">
-        <!-- Flash Messages -->
-        <c:if test="${not empty param.success}">
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle"></i> ${param.success}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        </c:if>
-        <c:if test="${not empty param.error}">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> ${param.error}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        </c:if>
-        <c:if test="${not empty error}">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle"></i> ${error}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        </c:if>
+    <!-- Main Content Wrapper -->
+    <div class="main-wrapper ${not empty sessionScope.user ? 'has-sidebar' : ''}" id="mainWrapper">
+        <main class="main-content">
+            <!-- Flash Messages -->
+            <c:if test="${not empty param.success}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> ${param.success}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty param.error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${param.error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> ${error}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
 
-        <jsp:doBody/>
-    </main>
+            <jsp:doBody/>
+        </main>
 
-    <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-light">
-        <div class="container text-center">
-            <span class="text-muted">&copy; 2025 Ocean View Resort. All rights reserved.</span>
-        </div>
-    </footer>
+        <!-- Footer -->
+        <footer class="app-footer">
+            <span>&copy; 2025 Ocean View Resort. All rights reserved.</span>
+        </footer>
+    </div>
+
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/js/app.js"></script>

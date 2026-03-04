@@ -5,6 +5,60 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+    // ---- Sidebar Toggle ----
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const COLLAPSED_KEY = 'sidebar-collapsed';
+
+    function isMobile() {
+        return window.innerWidth <= 992;
+    }
+
+    // Restore sidebar state from localStorage (desktop only)
+    if (!isMobile() && localStorage.getItem(COLLAPSED_KEY) === 'true') {
+        document.body.classList.add('sidebar-collapsed');
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function () {
+            if (isMobile()) {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('active');
+            } else {
+                document.body.classList.toggle('sidebar-collapsed');
+                localStorage.setItem(COLLAPSED_KEY, document.body.classList.contains('sidebar-collapsed'));
+            }
+        });
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', function () {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+        });
+    }
+
+    // Close sidebar on mobile when a link is clicked
+    if (sidebar) {
+        sidebar.querySelectorAll('.sidebar-menu a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (isMobile()) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                }
+            });
+        });
+    }
+
+    // Handle window resize
+    window.addEventListener('resize', function () {
+        if (!isMobile()) {
+            sidebar && sidebar.classList.remove('open');
+            sidebarOverlay && sidebarOverlay.classList.remove('active');
+        }
+    });
+
     // ---- Auto-dismiss alerts after 5 seconds ----
     const alerts = document.querySelectorAll('.alert-dismissible');
     alerts.forEach(function (alert) {
@@ -35,9 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ---- Active nav link highlighting (fallback) ----
+    // ---- Active sidebar link highlighting (fallback) ----
     const currentPath = window.location.pathname;
-    document.querySelectorAll('.navbar .nav-link').forEach(function (link) {
+    document.querySelectorAll('.sidebar-menu a').forEach(function (link) {
         const href = link.getAttribute('href');
         if (href && currentPath.includes(href) && href !== '/') {
             link.classList.add('active');
@@ -100,7 +154,7 @@ function debounce(func, wait) {
  * Format currency display.
  */
 function formatCurrency(amount) {
-    return '$' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+    return 'LKR ' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
 
 /**
@@ -125,4 +179,19 @@ function apiCall(url, method, data) {
             }
             return response.json();
         });
+}
+
+/**
+ * Toggle password visibility.
+ */
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
 }
