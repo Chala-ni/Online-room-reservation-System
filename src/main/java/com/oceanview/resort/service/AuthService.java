@@ -59,4 +59,54 @@ public class AuthService {
     public boolean resetPassword(int userId, String newPassword) throws SQLException {
         return userDAO.updatePassword(userId, PasswordHasher.hash(newPassword));
     }
+
+    /**
+     * Find all users.
+     */
+    public java.util.List<User> findAllUsers() throws SQLException {
+        return userDAO.findAll();
+    }
+
+    /**
+     * Create a new user with individual parameters.
+     */
+    public int createUser(String username, String password, com.oceanview.resort.model.enums.UserRole role,
+                           String fullName, String email) throws SQLException {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(PasswordHasher.hash(password));
+        user.setRole(role);
+        user.setFullName(fullName);
+        user.setEmail(email);
+        user.setActive(true);
+        return userDAO.create(user);
+    }
+
+    /**
+     * Find a user by username.
+     */
+    public User findByUsername(String username) throws SQLException {
+        return userDAO.findByUsername(username);
+    }
+
+    /**
+     * Find a user by email.
+     */
+    public User findByEmail(String email) throws SQLException {
+        return userDAO.findByEmail(email);
+    }
+
+    /**
+     * Deactivate a user account.
+     */
+    public boolean deactivateUser(int userId) throws SQLException {
+        return userDAO.deactivate(userId);
+    }
+
+    /**
+     * Activate a previously deactivated user account.
+     */
+    public boolean activateUser(int userId) throws SQLException {
+        return userDAO.activate(userId);
+    }
 }

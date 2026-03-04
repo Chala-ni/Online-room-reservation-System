@@ -179,4 +179,45 @@ public class ReservationService {
     public int getActiveCount() throws SQLException {
         return reservationDAO.getActiveCount();
     }
+
+    /**
+     * Update an existing reservation.
+     */
+    public boolean update(Reservation reservation) throws SQLException {
+        return reservationDAO.update(reservation);
+    }
+
+    /**
+     * Check in a guest for a reservation.
+     * Validates that check-in date has arrived (allows same-day check-in).
+     */
+    public boolean checkIn(int reservationId, int userId) throws SQLException {
+        Reservation reservation = reservationDAO.findById(reservationId);
+        if (reservation == null) {
+            throw new IllegalStateException("Reservation not found");
+        }
+        
+        // Validate check-in date - must be today or in the past
+        Date today = new Date(System.currentTimeMillis());
+        if (reservation.getCheckInDate().after(today)) {
+            throw new IllegalStateException("Cannot check in before the scheduled check-in date (" 
+                    + reservation.getCheckInDate() + "). Please wait until the check-in date.");
+        }
+        
+        return updateStatus(reservationId, ReservationStatus.CHECKED_IN);
+    }
+
+    /**
+     * Check out a guest from a reservation.
+     */
+    public boolean checkOut(int reservationId, int userId) throws SQLException {
+        return updateStatus(reservationId, ReservationStatus.CHECKED_OUT);
+    }
+
+    /**
+     * Cancel a reservation.
+     */
+    public boolean cancel(int reservationId, int userId) throws SQLException {
+        return updateStatus(reservationId, ReservationStatus.CANCELLED);
+    }
 }
