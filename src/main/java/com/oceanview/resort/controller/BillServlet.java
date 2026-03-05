@@ -2,6 +2,7 @@ package com.oceanview.resort.controller;
 
 import com.oceanview.resort.model.Bill;
 import com.oceanview.resort.model.Reservation;
+import com.oceanview.resort.model.User;
 import com.oceanview.resort.service.BillingService;
 import com.oceanview.resort.service.ReservationService;
 import com.oceanview.resort.util.ErrorMessageUtil;
@@ -75,6 +76,8 @@ public class BillServlet extends HttpServlet {
             throws SQLException, IOException {
 
         int reservationId = Integer.parseInt(request.getParameter("reservationId"));
+        User currentUser = (User) request.getSession().getAttribute("user");
+        int performedBy = currentUser != null ? currentUser.getId() : 0;
 
         try {
             Reservation reservation = reservationService.findById(reservationId);
@@ -83,7 +86,7 @@ public class BillServlet extends HttpServlet {
                 return;
             }
 
-            Bill bill = billingService.generateBill(reservation.getId());
+            Bill bill = billingService.generateBill(reservation.getId(), performedBy);
             response.sendRedirect(request.getContextPath() + "/bills/view?id=" + bill.getId()
                     + "&success=Bill+generated+successfully");
         } catch (IllegalStateException e) {
@@ -96,7 +99,10 @@ public class BillServlet extends HttpServlet {
             throws SQLException, IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
-        billingService.markAsPaid(id);
+        User currentUser = (User) request.getSession().getAttribute("user");
+        int performedBy = currentUser != null ? currentUser.getId() : 0;
+        
+        billingService.markAsPaid(id, performedBy);
         response.sendRedirect(request.getContextPath() + "/bills/view?id=" + id
                 + "&success=Payment+recorded+successfully");
     }

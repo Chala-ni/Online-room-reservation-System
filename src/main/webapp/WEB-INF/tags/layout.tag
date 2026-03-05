@@ -59,6 +59,12 @@
                         <span>Bills</span>
                     </a>
                 </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/notifications" class="${active == 'notifications' ? 'active' : ''}">
+                        <i class="bi bi-bell"></i>
+                        <span>Notifications</span>
+                    </a>
+                </li>
             </ul>
 
             <c:if test="${sessionScope.userRole == 'ADMIN'}">
@@ -74,6 +80,12 @@
                     <a href="${pageContext.request.contextPath}/users" class="${active == 'users' ? 'active' : ''}">
                         <i class="bi bi-person-gear"></i>
                         <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="${pageContext.request.contextPath}/audit" class="${active == 'audit' ? 'active' : ''}">
+                        <i class="bi bi-clipboard-data"></i>
+                        <span>Audit Log</span>
                     </a>
                 </li>
             </ul>
