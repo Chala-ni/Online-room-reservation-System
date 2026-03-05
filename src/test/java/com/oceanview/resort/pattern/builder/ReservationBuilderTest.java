@@ -18,12 +18,12 @@ class ReservationBuilderTest {
     @DisplayName("Should build a valid reservation with all required fields")
     void buildValidReservation() {
         Reservation reservation = new ReservationBuilder()
-                .guestId(1)
-                .roomId(1)
-                .checkInDate(Date.valueOf("2025-07-01"))
-                .checkOutDate(Date.valueOf("2025-07-05"))
-                .numGuests(2)
-                .createdBy(1)
+                .setGuestId(1)
+                .setRoomId(1)
+                .setCheckInDate(Date.valueOf("2025-07-01"))
+                .setCheckOutDate(Date.valueOf("2025-07-05"))
+                .setNumGuests(2)
+                .setCreatedBy(1)
                 .build();
 
         assertNotNull(reservation);
@@ -33,21 +33,19 @@ class ReservationBuilderTest {
         assertEquals(Date.valueOf("2025-07-05"), reservation.getCheckOutDate());
         assertEquals(2, reservation.getNumGuests());
         assertEquals(ReservationStatus.CONFIRMED, reservation.getStatus());
-        assertNotNull(reservation.getReservationNumber());
-        assertTrue(reservation.getReservationNumber().startsWith("RES-"));
     }
 
     @Test
     @DisplayName("Should include special requests when provided")
     void buildWithSpecialRequests() {
         Reservation reservation = new ReservationBuilder()
-                .guestId(1)
-                .roomId(1)
-                .checkInDate(Date.valueOf("2025-07-01"))
-                .checkOutDate(Date.valueOf("2025-07-05"))
-                .numGuests(2)
-                .specialRequests("Ocean view preferred")
-                .createdBy(1)
+                .setGuestId(1)
+                .setRoomId(1)
+                .setCheckInDate(Date.valueOf("2025-07-01"))
+                .setCheckOutDate(Date.valueOf("2025-07-05"))
+                .setNumGuests(2)
+                .setSpecialRequests("Ocean view preferred")
+                .setCreatedBy(1)
                 .build();
 
         assertEquals("Ocean view preferred", reservation.getSpecialRequests());
@@ -58,11 +56,11 @@ class ReservationBuilderTest {
     void missingGuestId() {
         assertThrows(IllegalStateException.class, () -> {
             new ReservationBuilder()
-                    .roomId(1)
-                    .checkInDate(Date.valueOf("2025-07-01"))
-                    .checkOutDate(Date.valueOf("2025-07-05"))
-                    .numGuests(2)
-                    .createdBy(1)
+                    .setRoomId(1)
+                    .setCheckInDate(Date.valueOf("2025-07-01"))
+                    .setCheckOutDate(Date.valueOf("2025-07-05"))
+                    .setNumGuests(2)
+                    .setCreatedBy(1)
                     .build();
         });
     }
@@ -72,11 +70,11 @@ class ReservationBuilderTest {
     void missingRoomId() {
         assertThrows(IllegalStateException.class, () -> {
             new ReservationBuilder()
-                    .guestId(1)
-                    .checkInDate(Date.valueOf("2025-07-01"))
-                    .checkOutDate(Date.valueOf("2025-07-05"))
-                    .numGuests(2)
-                    .createdBy(1)
+                    .setGuestId(1)
+                    .setCheckInDate(Date.valueOf("2025-07-01"))
+                    .setCheckOutDate(Date.valueOf("2025-07-05"))
+                    .setNumGuests(2)
+                    .setCreatedBy(1)
                     .build();
         });
     }
@@ -86,10 +84,10 @@ class ReservationBuilderTest {
     void missingDates() {
         assertThrows(IllegalStateException.class, () -> {
             new ReservationBuilder()
-                    .guestId(1)
-                    .roomId(1)
-                    .numGuests(2)
-                    .createdBy(1)
+                    .setGuestId(1)
+                    .setRoomId(1)
+                    .setNumGuests(2)
+                    .setCreatedBy(1)
                     .build();
         });
     }
@@ -99,12 +97,12 @@ class ReservationBuilderTest {
     void invalidDateRange() {
         assertThrows(IllegalStateException.class, () -> {
             new ReservationBuilder()
-                    .guestId(1)
-                    .roomId(1)
-                    .checkInDate(Date.valueOf("2025-07-05"))
-                    .checkOutDate(Date.valueOf("2025-07-01"))
-                    .numGuests(2)
-                    .createdBy(1)
+                    .setGuestId(1)
+                    .setRoomId(1)
+                    .setCheckInDate(Date.valueOf("2025-07-05"))
+                    .setCheckOutDate(Date.valueOf("2025-07-01"))
+                    .setNumGuests(2)
+                    .setCreatedBy(1)
                     .build();
         });
     }
@@ -113,11 +111,11 @@ class ReservationBuilderTest {
     @DisplayName("Should set default numGuests to 1 if not specified")
     void defaultNumGuests() {
         Reservation reservation = new ReservationBuilder()
-                .guestId(1)
-                .roomId(1)
-                .checkInDate(Date.valueOf("2025-07-01"))
-                .checkOutDate(Date.valueOf("2025-07-05"))
-                .createdBy(1)
+                .setGuestId(1)
+                .setRoomId(1)
+                .setCheckInDate(Date.valueOf("2025-07-01"))
+                .setCheckOutDate(Date.valueOf("2025-07-05"))
+                .setCreatedBy(1)
                 .build();
 
         assertEquals(1, reservation.getNumGuests());

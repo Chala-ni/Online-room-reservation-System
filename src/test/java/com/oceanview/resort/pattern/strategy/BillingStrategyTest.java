@@ -20,7 +20,7 @@ class BillingStrategyTest {
         double ratePerNight = 100.0;
         int numNights = 3;
 
-        double subtotal = strategy.calculateSubtotal(ratePerNight, numNights);
+        double subtotal = strategy.calculateSubtotal(numNights, ratePerNight);
 
         assertEquals(300.0, subtotal, 0.01);
     }
@@ -49,7 +49,7 @@ class BillingStrategyTest {
         double ratePerNight = 200.0;
         int numNights = 3;
 
-        double subtotal = strategy.calculateSubtotal(ratePerNight, numNights);
+        double subtotal = strategy.calculateSubtotal(numNights, ratePerNight);
 
         // 200 * 3 * 1.05 = 630.0
         assertEquals(630.0, subtotal, 0.01);
@@ -65,7 +65,7 @@ class BillingStrategyTest {
         double ratePerNight = 350.0;
         int numNights = 3;
 
-        double subtotal = strategy.calculateSubtotal(ratePerNight, numNights);
+        double subtotal = strategy.calculateSubtotal(numNights, ratePerNight);
 
         // 350 * 3 * 1.10 = 1155.0
         assertEquals(1155.0, subtotal, 0.01);
@@ -78,7 +78,7 @@ class BillingStrategyTest {
         double ratePerNight = 350.0;
         int numNights = 5;
 
-        double subtotal = strategy.calculateSubtotal(ratePerNight, numNights);
+        double subtotal = strategy.calculateSubtotal(numNights, ratePerNight);
 
         // 350 * 5 * 1.10 * 0.95 = 1828.75
         assertEquals(1828.75, subtotal, 0.01);
@@ -91,7 +91,7 @@ class BillingStrategyTest {
         double ratePerNight = 100.0;
         int numNights = 5;
 
-        double subtotal = strategy.calculateSubtotal(ratePerNight, numNights);
+        double subtotal = strategy.calculateSubtotal(numNights, ratePerNight);
 
         // 100 * 5 * 1.10 * 0.95 = 522.5
         assertEquals(522.5, subtotal, 0.01);
@@ -104,13 +104,13 @@ class BillingStrategyTest {
     @DisplayName("Zero nights should return zero")
     void zeroNights() {
         BillingStrategy strategy = new StandardRoomBilling();
-        assertEquals(0.0, strategy.calculateSubtotal(100.0, 0), 0.01);
+        assertEquals(0.0, strategy.calculateSubtotal(0, 100.0), 0.01);
     }
 
     @Test
     @DisplayName("Single night standard room calculation")
     void singleNight() {
         BillingStrategy strategy = new StandardRoomBilling();
-        assertEquals(100.0, strategy.calculateSubtotal(100.0, 1), 0.01);
+        assertEquals(100.0, strategy.calculateSubtotal(1, 100.0), 0.01);
     }
 }

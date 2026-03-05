@@ -27,20 +27,20 @@ class ReservationSubjectTest {
     @Test
     @DisplayName("Should register observer successfully")
     void registerObserver() {
-        subject.registerObserver(observer1);
+        subject.addObserver(observer1);
         Reservation r = createTestReservation();
-        subject.notifyCreated(r);
+        subject.notifyReservationCreated(r);
         assertTrue(observer1.createdCalled);
     }
 
     @Test
     @DisplayName("Should notify all registered observers on creation")
     void notifyAllOnCreate() {
-        subject.registerObserver(observer1);
-        subject.registerObserver(observer2);
+        subject.addObserver(observer1);
+        subject.addObserver(observer2);
         Reservation r = createTestReservation();
 
-        subject.notifyCreated(r);
+        subject.notifyReservationCreated(r);
 
         assertTrue(observer1.createdCalled);
         assertTrue(observer2.createdCalled);
@@ -49,22 +49,22 @@ class ReservationSubjectTest {
     @Test
     @DisplayName("Should notify observers on status update")
     void notifyOnUpdate() {
-        subject.registerObserver(observer1);
+        subject.addObserver(observer1);
         Reservation r = createTestReservation();
 
-        subject.notifyUpdated(r, ReservationStatus.CHECKED_IN);
+        subject.notifyReservationUpdated(r, "CONFIRMED", "CHECKED_IN");
 
         assertTrue(observer1.updatedCalled);
-        assertEquals(ReservationStatus.CHECKED_IN, observer1.lastNewStatus);
+        assertEquals("CHECKED_IN", observer1.lastNewStatus);
     }
 
     @Test
     @DisplayName("Should notify observers on cancellation")
     void notifyOnCancel() {
-        subject.registerObserver(observer1);
+        subject.addObserver(observer1);
         Reservation r = createTestReservation();
 
-        subject.notifyCancelled(r);
+        subject.notifyReservationCancelled(r);
 
         assertTrue(observer1.cancelledCalled);
     }
@@ -72,12 +72,12 @@ class ReservationSubjectTest {
     @Test
     @DisplayName("Should remove observer and stop notifications")
     void removeObserver() {
-        subject.registerObserver(observer1);
-        subject.registerObserver(observer2);
+        subject.addObserver(observer1);
+        subject.addObserver(observer2);
         subject.removeObserver(observer1);
         Reservation r = createTestReservation();
 
-        subject.notifyCreated(r);
+        subject.notifyReservationCreated(r);
 
         assertFalse(observer1.createdCalled);
         assertTrue(observer2.createdCalled);
@@ -87,9 +87,9 @@ class ReservationSubjectTest {
     @DisplayName("Should handle empty observer list without errors")
     void emptyObserverList() {
         Reservation r = createTestReservation();
-        assertDoesNotThrow(() -> subject.notifyCreated(r));
-        assertDoesNotThrow(() -> subject.notifyUpdated(r, ReservationStatus.CHECKED_IN));
-        assertDoesNotThrow(() -> subject.notifyCancelled(r));
+        assertDoesNotThrow(() -> subject.notifyReservationCreated(r));
+        assertDoesNotThrow(() -> subject.notifyReservationUpdated(r, "CONFIRMED", "CHECKED_IN"));
+        assertDoesNotThrow(() -> subject.notifyReservationCancelled(r));
     }
 
     // Helper methods
@@ -110,7 +110,7 @@ class ReservationSubjectTest {
         boolean createdCalled = false;
         boolean updatedCalled = false;
         boolean cancelledCalled = false;
-        ReservationStatus lastNewStatus = null;
+        String lastNewStatus = null;
 
         @Override
         public void onReservationCreated(Reservation reservation) {
@@ -118,7 +118,7 @@ class ReservationSubjectTest {
         }
 
         @Override
-        public void onReservationUpdated(Reservation reservation, ReservationStatus newStatus) {
+        public void onReservationUpdated(Reservation reservation, String oldStatus, String newStatus) {
             updatedCalled = true;
             lastNewStatus = newStatus;
         }
