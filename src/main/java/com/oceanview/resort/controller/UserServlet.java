@@ -134,7 +134,9 @@ public class UserServlet extends HttpServlet {
                 showCreateForm(request, response);
                 return;
             }
-            authService.createUser(username, password, UserRole.valueOf(roleStr), fullName, email);
+            User currentUser = (User) request.getSession().getAttribute("user");
+            int performedBy = currentUser != null ? currentUser.getId() : 0;
+            authService.createUser(username, password, UserRole.valueOf(roleStr), fullName, email, performedBy);
             response.sendRedirect(request.getContextPath() + "/users?success=User+created+successfully");
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", e.getMessage());
@@ -153,7 +155,7 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
-        authService.deactivateUser(id);
+        authService.deactivateUser(id, currentUser.getId());
         response.sendRedirect(request.getContextPath() + "/users?success=User+deactivated+successfully");
     }
 
@@ -161,7 +163,10 @@ public class UserServlet extends HttpServlet {
             throws SQLException, IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
-        authService.activateUser(id);
+        User currentUser = (User) request.getSession().getAttribute("user");
+        int performedBy = currentUser != null ? currentUser.getId() : 0;
+        
+        authService.activateUser(id, performedBy);
         response.sendRedirect(request.getContextPath() + "/users?success=User+activated+successfully");
     }
 
@@ -185,7 +190,10 @@ public class UserServlet extends HttpServlet {
             return;
         }
 
-        authService.resetPassword(userId, newPassword);
+        User currentUser = (User) request.getSession().getAttribute("user");
+        int performedBy = currentUser != null ? currentUser.getId() : 0;
+        
+        authService.resetPassword(userId, newPassword, performedBy);
         response.sendRedirect(request.getContextPath() + "/users?success=Password+reset+successfully");
     }
 

@@ -1,7 +1,9 @@
 package com.oceanview.resort.service;
 
+import com.oceanview.resort.dao.AuditLogDAO;
 import com.oceanview.resort.dao.BillDAO;
 import com.oceanview.resort.dao.ReservationDAO;
+import com.oceanview.resort.model.AuditLog;
 import com.oceanview.resort.model.Bill;
 import com.oceanview.resort.model.Reservation;
 import com.oceanview.resort.model.enums.PaymentStatus;
@@ -18,12 +20,13 @@ public class BillingService {
 
     private final BillDAO billDAO = new BillDAO();
     private final ReservationDAO reservationDAO = new ReservationDAO();
+    private final AuditLogDAO auditLogDAO = new AuditLogDAO();
 
     /**
      * Generate a bill for a reservation using the Strategy pattern.
      * The billing strategy is selected based on the room type.
      */
-    public Bill generateBill(int reservationId) throws SQLException {
+    public Bill generateBill(int reservationId, int performedBy) throws SQLException {
         Reservation reservation = reservationDAO.findById(reservationId);
         if (reservation == null) {
             throw new IllegalArgumentException("Reservation not found");
@@ -62,6 +65,10 @@ public class BillingService {
         int id = billDAO.create(bill);
         bill.setId(id);
 
+        // Audit log
+        logAudit("CREATE", "BILL", id, performedBy, 
+                 "Bill generated for reservation " + reservation.getReservationNumber() + ", total: LKR " + bill.getTotalAmount());
+
         // Set display fields
         bill.setReservationNumber(reservation.getReservationNumber());
         bill.setGuestName(reservation.getGuestName());
@@ -93,8 +100,26 @@ public class BillingService {
     /**
      * Mark a bill as paid.
      */
-    public boolean markAsPaid(int billId) throws SQLException {
-        return billDAO.updatePaymentStatus(billId, PaymentStatus.PAID);
+    public boolean markAsPaid(int billId, int performedBy) throws SQLException {
+        Bill bill = billDAO.findById(billId);
+        boolean result = billDAO.updatePaymentStatus(billId, PaymentStatus.PAID);
+        if (result && bill != null) {
+            logAudit("PAYMENT", "BILL", billId, performedBy, 
+                     "Bill #" + billId + " marked as PAID, amount: LKR " + bill.getTotalAmount());
+        }
+        return result;
+    }
+
+    /**
+     * Log an audit entry.
+     */
+    private void logAudit(String action, String entityType, int entityId, int performedBy, String details) {
+        try {
+            AuditLog log = new AuditLog(action, entityType, entityId, performedBy, details);
+            auditLogDAO.create(log);
+        } catch (Exception e) {
+            System.err.println("Failed to log audit: " + e.getMessage());
+        }
     }
 
     public Bill findByReservationId(int reservationId) throws SQLException {

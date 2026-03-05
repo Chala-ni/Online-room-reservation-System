@@ -1,6 +1,8 @@
 package com.oceanview.resort.service;
 
+import com.oceanview.resort.dao.AuditLogDAO;
 import com.oceanview.resort.dao.UserDAO;
+import com.oceanview.resort.model.AuditLog;
 import com.oceanview.resort.model.User;
 import com.oceanview.resort.util.PasswordHasher;
 
@@ -13,6 +15,7 @@ import java.sql.SQLException;
 public class AuthService {
 
     private final UserDAO userDAO = new UserDAO();
+    private final AuditLogDAO auditLogDAO = new AuditLogDAO();
 
     /**
      * Authenticate a user with username and plain-text password.
@@ -56,8 +59,13 @@ public class AuthService {
     /**
      * Reset a user's password (admin function).
      */
-    public boolean resetPassword(int userId, String newPassword) throws SQLException {
-        return userDAO.updatePassword(userId, PasswordHasher.hash(newPassword));
+    public boolean resetPassword(int userId, String newPassword, int performedBy) throws SQLException {
+        User user = userDAO.findById(userId);
+        boolean result = userDAO.updatePassword(userId, PasswordHasher.hash(newPassword));
+        if (result && user != null) {
+            logAudit("PASSWORD_RESET", "USER", userId, performedBy, "Password reset for user '" + user.getUsername() + "'");
+        }
+        return result;
     }
 
     /**
@@ -71,7 +79,7 @@ public class AuthService {
      * Create a new user with individual parameters.
      */
     public int createUser(String username, String password, com.oceanview.resort.model.enums.UserRole role,
-                           String fullName, String email) throws SQLException {
+                           String fullName, String email, int performedBy) throws SQLException {
         User user = new User();
         user.setUsername(username);
         user.setPassword(PasswordHasher.hash(password));
@@ -79,7 +87,11 @@ public class AuthService {
         user.setFullName(fullName);
         user.setEmail(email);
         user.setActive(true);
-        return userDAO.create(user);
+        int id = userDAO.create(user);
+        
+        // Audit log
+        logAudit("CREATE", "USER", id, performedBy, "User '" + username + "' created with role " + role);
+        return id;
     }
 
     /**
@@ -99,14 +111,36 @@ public class AuthService {
     /**
      * Deactivate a user account.
      */
-    public boolean deactivateUser(int userId) throws SQLException {
-        return userDAO.deactivate(userId);
+    public boolean deactivateUser(int userId, int performedBy) throws SQLException {
+        User user = userDAO.findById(userId);
+        boolean result = userDAO.deactivate(userId);
+        if (result && user != null) {
+            logAudit("DEACTIVATE", "USER", userId, performedBy, "User '" + user.getUsername() + "' deactivated");
+        }
+        return result;
     }
 
     /**
      * Activate a previously deactivated user account.
      */
-    public boolean activateUser(int userId) throws SQLException {
-        return userDAO.activate(userId);
+    public boolean activateUser(int userId, int performedBy) throws SQLException {
+        User user = userDAO.findById(userId);
+        boolean result = userDAO.activate(userId);
+        if (result && user != null) {
+            logAudit("ACTIVATE", "USER", userId, performedBy, "User '" + user.getUsername() + "' activated");
+        }
+        return result;
+    }
+
+    /**
+     * Log an audit entry.
+     */
+    private void logAudit(String action, String entityType, int entityId, int performedBy, String details) {
+        try {
+            AuditLog log = new AuditLog(action, entityType, entityId, performedBy, details);
+            auditLogDAO.create(log);
+        } catch (Exception e) {
+            System.err.println("Failed to log audit: " + e.getMessage());
+        }
     }
 }
