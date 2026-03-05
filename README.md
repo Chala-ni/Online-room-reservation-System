@@ -92,6 +92,8 @@ source sql/triggers-and-functions.sql;
 ```
 
 ### Build & Deploy
+
+**Linux/Mac:**
 ```bash
 # Build the WAR file
 mvn clean package
@@ -101,6 +103,18 @@ cp target/ocean-view-resort.war $CATALINA_HOME/webapps/
 
 # Start Tomcat
 $CATALINA_HOME/bin/startup.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+# Build the WAR file
+mvn clean package
+
+# Copy WAR to Tomcat
+Copy-Item "target\ocean-view-resort.war" "$env:CATALINA_HOME\webapps\" -Force
+
+# Start Tomcat
+& "$env:CATALINA_HOME\bin\startup.bat"
 ```
 
 ### Access
